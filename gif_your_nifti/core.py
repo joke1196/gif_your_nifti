@@ -32,6 +32,15 @@ def parse_filename(filepath):
     basename, ext = filename.split(os.extsep, 1)
     return dirname, basename, ext
 
+def define_output_file_name(filename, outputfile, suffix):
+    # Figure out extension
+    ext = '.{}'.format(parse_filename(filename)[2])
+    outputfilename = filename.replace(ext, '{}.gif'.format(suffix))
+    if outputfile:
+        outputfilename = '{}.gif'.format(outputfile)
+    return outputfilename
+
+
 
 def load_and_prepare_image(filename, size=1):
     """Load and prepare image data.
@@ -166,7 +175,7 @@ def create_mosaic_RGB(out_img1, out_img2, out_img3, maximum):
     return out_img
 
 
-def write_gif_normal(filename, size=1, fps=18):
+def write_gif_normal(filename, outputfile, size=1, fps=18):
     """Procedure for writing grayscale image.
 
     Parameters
@@ -185,15 +194,13 @@ def write_gif_normal(filename, size=1, fps=18):
     # Create output mosaic
     new_img = create_mosaic_normal(out_img, maximum)
 
-    # Figure out extension
-    ext = '.{}'.format(parse_filename(filename)[2])
 
     # Write gif file
-    mimwrite(filename.replace(ext, '.gif'), new_img,
+    mimwrite(define_output_file_name(filename, outputfile, ""), new_img,
              format='gif', fps=int(fps * size))
 
 
-def write_gif_depth(filename, size=1, fps=18):
+def write_gif_depth(filename, outputfile, size=1, fps=18):
     """Procedure for writing depth image.
 
     The image shows you in color what the value of the next slice will be. If
@@ -217,11 +224,8 @@ def write_gif_depth(filename, size=1, fps=18):
     # Create output mosaic
     new_img = create_mosaic_depth(out_img, maximum)
 
-    # Figure out extension
-    ext = '.{}'.format(parse_filename(filename)[2])
-
     # Write gif file
-    mimwrite(filename.replace(ext, '_depth.gif'), new_img,
+    mimwrite(define_output_file_name(filename, outputfile, "_depth"), new_img,
              format='gif', fps=int(fps * size))
 
 
@@ -263,7 +267,7 @@ def write_gif_rgb(filename1, filename2, filename3, size=1, fps=18):
     mimwrite(out_path, new_img, format='gif', fps=int(fps * size))
 
 
-def write_gif_pseudocolor(filename, size=1, fps=18, colormap='hot'):
+def write_gif_pseudocolor(filename,outputfile, size=1, fps=18, colormap='hot'):
     """Procedure for writing pseudo color image.
 
     The colormap can be any colormap from matplotlib.
@@ -291,8 +295,6 @@ def write_gif_pseudocolor(filename, size=1, fps=18, colormap='hot'):
     color_transformed = [cmap(new_img[i, ...]) for i in range(maximum)]
     cmap_img = np.delete(color_transformed, 3, 3)
 
-    # Figure out extension
-    ext = '.{}'.format(parse_filename(filename)[2])
     # Write gif file
-    mimwrite(filename.replace(ext, '_{}.gif'.format(colormap)),
+    mimwrite(define_output_file_name(filename, outputfile, "_{}".format(colormap)),
              cmap_img, format='gif', fps=int(fps * size))

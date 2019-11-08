@@ -37,11 +37,18 @@ def main():
         help="Color map. Used only in combination with 'pseudocolor' mode."
         )
 
+    parser.add_argument(
+        '--output', type=str, required=False,
+        metavar=cfg.output, default=cfg.output,
+        help="Define a name for the output file"
+    )
+
     args = parser.parse_args()
     cfg.mode = (args.mode).lower()
     cfg.size = args.size
     cfg.fps = args.fps
     cfg.cmap = args.cmap
+    cfg.output = args.output
 
     # Welcome message
     welcome_str = '{} {}'.format('gif_your_nifti', __version__)
@@ -49,20 +56,21 @@ def main():
     print('{}\n{}\n{}'.format(welcome_decor, welcome_str, welcome_decor))
 
     print('Selections:')
-    print('  mode = {}'.format(cfg.mode))
-    print('  size = {}'.format(cfg.size))
-    print('  fps  = {}'.format(cfg.fps))
+    print('  mode        = {}'.format(cfg.mode))
+    print('  size        = {}'.format(cfg.size))
+    print('  fps         = {}'.format(cfg.fps))
+    print('  outputfile  = {}'.format(cfg.output))
 
     # Determine gif creation mode
     if cfg.mode in ['normal', 'pseudocolor', 'depth']:
         for f in args.filename:
             if cfg.mode == 'normal':
-                core.write_gif_normal(f, cfg.size, cfg.fps)
+                core.write_gif_normal(f, cfg.output, cfg.size, cfg.fps)
             elif cfg.mode == 'pseudocolor':
                 print('  cmap = {}'.format(cfg.cmap))
-                core.write_gif_pseudocolor(f, cfg.size, cfg.fps, cfg.cmap)
+                core.write_gif_pseudocolor(f, cfg.output, cfg.size, cfg.fps, cfg.cmap)
             elif cfg.mode == 'depth':
-                core.write_gif_depth(f, cfg.size, cfg.fps)
+                core.write_gif_depth(f, cfg.output, cfg.size, cfg.fps)
 
     elif cfg.mode == 'rgb':
         if len(args.filename) != 3:
