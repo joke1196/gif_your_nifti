@@ -60,12 +60,15 @@ def load_and_prepare_image(filename, size=1):
     # Load NIfTI file
     data = nb.load(filename).get_fdata()
 
+    if len(data.shape) > 3:
+        raise ValueError("Cannot handle 4D files yet")
+
     # Pad data array with zeros to make the shape isometric
     maximum = np.max(data.shape)
 
     out_img = np.zeros([maximum] * 3)
 
-    a, b, c = data.shape
+    a, b, c, _ = data.shape
     x, y, z = (list(data.shape) - maximum) / -2
 
     out_img[int(x):a + int(x),
