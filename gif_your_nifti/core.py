@@ -68,7 +68,7 @@ def load_and_prepare_image(filename, size=1):
 
     out_img = np.zeros([maximum] * 3)
 
-    a, b, c, _ = data.shape
+    a, b, c = data.shape
     x, y, z = (list(data.shape) - maximum) / -2
 
     out_img[int(x):a + int(x),
