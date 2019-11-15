@@ -5,4 +5,4 @@ size = 1
 fps = 20
 cmap = 'hot'
 output = ''
-pixel_num = 250
+pixel_num = -1

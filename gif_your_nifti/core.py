@@ -32,6 +32,7 @@ def parse_filename(filepath):
     basename, ext = filename.split(os.extsep, 1)
     return dirname, basename, ext
 
+
 def define_output_file_name(filename, outputfile, suffix):
     # Figure out extension
     ext = '.{}'.format(parse_filename(filename)[2])
@@ -41,8 +42,7 @@ def define_output_file_name(filename, outputfile, suffix):
     return outputfilename
 
 
-
-def load_and_prepare_image(filename, pixel_num):
+def load_and_prepare_image(filename, pixel_num, size):
     """Load and prepare image data.
 
     Parameters
@@ -82,12 +82,17 @@ def load_and_prepare_image(filename, pixel_num):
     out_img /= out_img.max()  # scale image values between 0-1
 
     # Resize image by the following factor
-    if pixel_num is not None:
+    if size != 1:
+        out_img = resize(out_img, [int(size * maximum)] * 3)
+        maximum = int(maximum * size)
+
+    if pixel_num is not -1:
         out_img = resize(out_img, [pixel_num] * 3)
+        maximum = pixel_num
 
-    # maximum = int(maximum * size)
 
-    return out_img, pixel_num
+
+    return out_img, maximum
 
 
 def create_mosaic_normal(out_img, maximum):
@@ -182,7 +187,7 @@ def create_mosaic_RGB(out_img1, out_img2, out_img3, maximum):
     return out_img
 
 
-def write_gif_normal(filename, outputfile, pixel_num, fps=18):
+def write_gif_normal(filename, outputfile, pixel_num=-1, size=1, fps=18):
     """Procedure for writing grayscale image.
 
     Parameters
@@ -196,7 +201,7 @@ def write_gif_normal(filename, outputfile, pixel_num, fps=18):
 
     """
     # Load NIfTI and put it in right shape
-    out_img, maximum = load_and_prepare_image(filename, pixel_num)
+    out_img, maximum = load_and_prepare_image(filename, pixel_num, size)
 
     # Create output mosaic
     new_img = create_mosaic_normal(out_img, maximum)
@@ -207,7 +212,7 @@ def write_gif_normal(filename, outputfile, pixel_num, fps=18):
              format='gif', fps=int(fps))
 
 
-def write_gif_depth(filename, outputfile, pixel_num, fps=18):
+def write_gif_depth(filename, outputfile, pixel_num=-1, size=1, fps=18):
     """Procedure for writing depth image.
 
     The image shows you in color what the value of the next slice will be. If
@@ -236,7 +241,7 @@ def write_gif_depth(filename, outputfile, pixel_num, fps=18):
              format='gif', fps=int(fps * size))
 
 
-def write_gif_rgb(filename1, filename2, filename3, pixel_num, fps=18):
+def write_gif_rgb(filename1, filename2, filename3, pixel_num=-1, size=1, fps=18):
     """Procedure for writing RGB image.
 
     Parameters
@@ -256,9 +261,9 @@ def write_gif_rgb(filename1, filename2, filename3, pixel_num, fps=18):
 
     """
     # Load NIfTI and put it in right shape
-    out_img1, maximum1 = load_and_prepare_image(filename1, pixel_num)
-    out_img2, maximum2 = load_and_prepare_image(filename2, pixel_num)
-    out_img3, maximum3 = load_and_prepare_image(filename3, pixel_num)
+    out_img1, maximum1 = load_and_prepare_image(filename1, pixel_num, size)
+    out_img2, maximum2 = load_and_prepare_image(filename2, pixel_num, size)
+    out_img3, maximum3 = load_and_prepare_image(filename3, pixel_num, size)
 
     if maximum1 == maximum2 and maximum1 == maximum3:
         maximum = maximum1
@@ -276,7 +281,7 @@ def write_gif_rgb(filename1, filename2, filename3, pixel_num, fps=18):
     mimwrite(out_path, new_img, format='gif', fps=int(fps))
 
 
-def write_gif_pseudocolor(filename, outputfile, pixel_num, fps=18, colormap='hot'):
+def write_gif_pseudocolor(filename, outputfile, pixel_num=-1, size=1, fps=18, colormap='hot'):
     """Procedure for writing pseudo color image.
 
     The colormap can be any colormap from matplotlib.
@@ -296,7 +301,7 @@ def write_gif_pseudocolor(filename, outputfile, pixel_num, fps=18, colormap='hot
 
     """
     # Load NIfTI and put it in right shape
-    out_img, maximum = load_and_prepare_image(filename, pixel_num)
+    out_img, maximum = load_and_prepare_image(filename, pixel_num, size)
 
     # Create output mosaic
     new_img = create_mosaic_normal(out_img, maximum)
