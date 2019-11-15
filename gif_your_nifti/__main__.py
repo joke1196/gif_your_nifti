@@ -44,7 +44,7 @@ def main():
     )
 
     parser.add_argument(
-        '--pixel_num', type=int, required=False,
+        '--pixel', type=int, required=False,
         metavar=cfg.pixel_num, default=cfg.pixel_num,
         help="Define a maximum size for the output image"
     )
