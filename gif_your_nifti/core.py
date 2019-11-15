@@ -58,22 +58,26 @@ def load_and_prepare_image(filename, size=1):
 
     """
     # Load NIfTI file
-    data = nb.load(filename).get_fdata()
+    proxy_img = nb.load(filename)
 
-    if len(data.shape) > 3:
-        raise ValueError("Cannot handle 4D files yet")
+    if len(proxy_img.shape) == 4:
+        #taking the volume in the middle
+        vol = proxy_img.shape[-1] / 2
+        img_data = proxy_img.dataobj[..., vol]
+    else:
+        img_data = np.asarray(proxy_img.dataobj)
 
     # Pad data array with zeros to make the shape isometric
-    maximum = np.max(data.shape)
+    maximum = np.max(img_data.shape)
 
     out_img = np.zeros([maximum] * 3)
 
-    a, b, c = data.shape
-    x, y, z = (list(data.shape) - maximum) / -2
+    a, b, c = img_data.shape
+    x, y, z = (list(img_data.shape) - maximum) / -2
 
     out_img[int(x):a + int(x),
             int(y):b + int(y),
-            int(z):c + int(z)] = data
+            int(z):c + int(z)] = img_data
 
     out_img /= out_img.max()  # scale image values between 0-1
 
