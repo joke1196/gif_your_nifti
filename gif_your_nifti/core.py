@@ -83,13 +83,12 @@ def load_and_prepare_image(filename, pixel_num, size):
 
     # Resize image by the following factor
     if size != 1:
-        out_img = resize(out_img, [int(size * maximum)] * 3)
         maximum = int(maximum * size)
 
     if pixel_num is not -1:
-        out_img = resize(out_img, [pixel_num] * 3)
         maximum = pixel_num
 
+    out_img = resize(out_img, [maximum] * 3)
 
 
     return out_img, maximum
