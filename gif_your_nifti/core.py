@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib.cm import get_cmap
 from imageio import mimwrite
 from skimage.transform import resize
-
+from skimage import img_as_ubyte
 
 def parse_filename(filepath):
     """Parse input file path into directory, basename and extension.
@@ -207,7 +207,7 @@ def write_gif_normal(filename, outputfile, pixel_num=-1, size=1, fps=18):
 
 
     # Write gif file
-    mimwrite(define_output_file_name(filename, outputfile, ""), new_img,
+    mimwrite(define_output_file_name(filename, outputfile, ""), img_as_ubyte(new_img),
              format='gif', fps=int(fps))
 
 
@@ -230,13 +230,13 @@ def write_gif_depth(filename, outputfile, pixel_num=-1, size=1, fps=18):
 
     """
     # Load NIfTI and put it in right shape
-    out_img, maximum = load_and_prepare_image(filename, pixel_num)
+    out_img, maximum = load_and_prepare_image(filename, pixel_num, size)
 
     # Create output mosaic
     new_img = create_mosaic_depth(out_img, maximum)
 
     # Write gif file
-    mimwrite(define_output_file_name(filename, outputfile, "_depth"), new_img,
+    mimwrite(define_output_file_name(filename, outputfile, "_depth"), img_as_ubyte(new_img),
              format='gif', fps=int(fps * size))
 
 
@@ -277,7 +277,7 @@ def write_gif_rgb(filename1, filename2, filename3, pixel_num=-1, size=1, fps=18)
     out_path = os.path.join(parse_filename(filename1)[0], out_filename)
 
     # Write gif file
-    mimwrite(out_path, new_img, format='gif', fps=int(fps))
+    mimwrite(out_path, img_as_ubyte(new_img), format='gif', fps=int(fps))
 
 
 def write_gif_pseudocolor(filename, outputfile, pixel_num=-1, size=1, fps=18, colormap='hot'):
@@ -312,4 +312,4 @@ def write_gif_pseudocolor(filename, outputfile, pixel_num=-1, size=1, fps=18, co
 
     # Write gif file
     mimwrite(define_output_file_name(filename, outputfile, "_{}".format(colormap)),
-             cmap_img, format='gif', fps=int(fps))
+             img_as_ubyte(cmap_img), format='gif', fps=int(fps))
